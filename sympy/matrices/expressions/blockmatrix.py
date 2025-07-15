@@ -164,7 +164,15 @@ class BlockMatrix(MatrixExpr):
     def _blockmul(self, other):
         if (isinstance(other, BlockMatrix) and
                 self.colblocksizes == other.rowblocksizes):
-            return BlockMatrix(self.blocks*other.blocks)
+            prod = self.blocks*other.blocks
+            def get_entry(i, j):
+                entry = prod[i, j]
+                if entry == 0 and not getattr(entry, 'is_Matrix', False):
+                    return ZeroMatrix(self.rowblocksizes[i], other.colblocksizes[j])
+                return entry
+            fixed = prod.__class__(prod.rows, prod.cols,
+                                   lambda i, j: get_entry(i, j))
+            return BlockMatrix(fixed)
 
         return self * other
 
