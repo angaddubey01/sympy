@@ -141,7 +141,7 @@ class StrPrinter(Printer):
         return 'E'
 
     def _print_ExprCondPair(self, expr):
-        return '(%s, %s)' % (expr.expr, expr.cond)
+        return '(%s, %s)' % (self._print(expr.expr), self._print(expr.cond))
 
     def _print_FiniteSet(self, s):
         s = sorted(s, key=default_sort_key)
@@ -204,10 +204,10 @@ class StrPrinter(Printer):
     def _print_Lambda(self, obj):
         args, expr = obj.args
         if len(args) == 1:
-            return "Lambda(%s, %s)" % (args.args[0], expr)
+            return "Lambda(%s, %s)" % (self._print(args.args[0]), self._print(expr))
         else:
             arg_string = ", ".join(self._print(arg) for arg in args)
-            return "Lambda((%s), %s)" % (arg_string, expr)
+            return "Lambda((%s), %s)" % (arg_string, self._print(expr))
 
     def _print_LatticeOp(self, expr):
         args = sorted(expr.args, key=default_sort_key)
@@ -216,9 +216,9 @@ class StrPrinter(Printer):
     def _print_Limit(self, expr):
         e, z, z0, dir = expr.args
         if str(dir) == "+":
-            return "Limit(%s, %s, %s)" % (e, z, z0)
+            return "Limit(%s, %s, %s)" % (self._print(e), self._print(z), self._print(z0))
         else:
-            return "Limit(%s, %s, %s, dir='%s')" % (e, z, z0, dir)
+            return "Limit(%s, %s, %s, dir='%s')" % (self._print(e), self._print(z), self._print(z0), dir)
 
     def _print_list(self, expr):
         return "[%s]" % self.stringify(expr, ", ")
@@ -341,7 +341,7 @@ class StrPrinter(Printer):
         return '-oo'
 
     def _print_Normal(self, expr):
-        return "Normal(%s, %s)" % (expr.mu, expr.sigma)
+        return "Normal(%s, %s)" % (self._print(expr.mu), self._print(expr.sigma))
 
     def _print_Order(self, expr):
         if all(p is S.Zero for p in expr.point) or not len(expr.variables):
@@ -630,7 +630,7 @@ class StrPrinter(Printer):
         }
 
         if expr.rel_op in charmap:
-            return '%s(%s, %s)' % (charmap[expr.rel_op], expr.lhs, expr.rhs)
+            return '%s(%s, %s)' % (charmap[expr.rel_op], self._print(expr.lhs), self._print(expr.rhs))
 
         return '%s %s %s' % (self.parenthesize(expr.lhs, precedence(expr)),
                            self._relationals.get(expr.rel_op) or expr.rel_op,
