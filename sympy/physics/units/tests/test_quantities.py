@@ -541,6 +541,15 @@ def test_issue_20288():
     assert SI._collect_factor_and_dimension(expr) == (1 + E, Dimension(1))
 
 
+def test_issue_exp_dimensionless_exponent():
+    from sympy.core.numbers import E
+    from sympy.physics.units import second, ohm, farad
+    expr = second/(ohm*farad)
+    assert SI.get_dimension_system().is_dimensionless(SI._collect_factor_and_dimension(expr)[1])
+    res = SI._collect_factor_and_dimension(100 + exp(expr))
+    assert res == (100 + E, Dimension(1))
+
+
 def test_prefixed_property():
     assert not meter.is_prefixed
     assert not joule.is_prefixed
