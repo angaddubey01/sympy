@@ -162,7 +162,7 @@ class NDimArray(object):
         return tuple(shape), iterable
 
     def __len__(self):
-        """Overload common function len(). Returns number of elements in array.
+        """Overload common function len(). Returns number of elements in the array.
 
         Examples
         ========
@@ -175,6 +175,8 @@ class NDimArray(object):
         9
 
         """
+        if self._rank == 0:
+            return 1
         return self._loop_size
 
     @property
