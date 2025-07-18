@@ -771,27 +771,36 @@ class MathMLPresentationPrinter(MathMLPrinterBase):
 
         mname = self.dom.createElement('mi')
         mname.appendChild(self.dom.createTextNode(name))
-        if len(supers) == 0:
-            if len(subs) == 0:
+
+        # handle sub- and superscripts
+        if not supers:
+            if not subs:
+                # simple identifier
                 x.appendChild(self.dom.createTextNode(name))
+                return x
             else:
                 msub = self.dom.createElement('msub')
+                if style == 'bold':
+                    msub.setAttribute('mathvariant', 'bold')
                 msub.appendChild(mname)
                 msub.appendChild(join(subs))
-                x.appendChild(msub)
+                return msub
         else:
-            if len(subs) == 0:
+            if not subs:
                 msup = self.dom.createElement('msup')
+                if style == 'bold':
+                    msup.setAttribute('mathvariant', 'bold')
                 msup.appendChild(mname)
                 msup.appendChild(join(supers))
-                x.appendChild(msup)
+                return msup
             else:
                 msubsup = self.dom.createElement('msubsup')
+                if style == 'bold':
+                    msubsup.setAttribute('mathvariant', 'bold')
                 msubsup.appendChild(mname)
                 msubsup.appendChild(join(subs))
                 msubsup.appendChild(join(supers))
-                x.appendChild(msubsup)
-        return x
+                return msubsup
 
     def _print_Pow(self, e):
         # Here we use root instead of power if the exponent is the reciprocal of an integer
