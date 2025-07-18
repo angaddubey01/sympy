@@ -357,7 +357,7 @@ class MathMLContentPrinter(MathMLPrinterBase):
             else:
                 return s
 
-        name, supers, subs = split_super_sub(sym.name)
+        name, supers, subs = split_super_sub(sym.name, split_digits=False)
         name = translate(name)
         supers = [translate(sup) for sup in supers]
         subs = [translate(sub) for sub in subs]
@@ -764,7 +764,7 @@ class MathMLPresentationPrinter(MathMLPrinterBase):
             else:
                 return s
 
-        name, supers, subs = split_super_sub(sym.name)
+        name, supers, subs = split_super_sub(sym.name, split_digits=False)
         name = translate(name)
         supers = [translate(sup) for sup in supers]
         subs = [translate(sub) for sub in subs]
