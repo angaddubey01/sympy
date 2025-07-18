@@ -507,7 +507,12 @@ class Function(Application, Expr):
             func = getattr(mpmath, fname)
         except (AttributeError, KeyError):
             try:
-                return Float(self._imp_(*self.args), prec)
+                result = self._imp_(*self.args)
+                # If the result is a SymPy expression, call evalf on it
+                if hasattr(result, 'evalf'):
+                    return result.evalf(prec)
+                else:
+                    return Float(result, prec)
             except (AttributeError, TypeError, ValueError):
                 return
 
