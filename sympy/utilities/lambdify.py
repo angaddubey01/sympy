@@ -956,12 +956,18 @@ def _recursive_to_string(doprint, arg):
         return doprint(arg)
     elif iterable(arg):
         if isinstance(arg, list):
-            left, right = "[]"
+            # Lists: use square brackets
+            left, right = "[", "]"
+            inner = ', '.join(_recursive_to_string(doprint, e) for e in arg)
+            return left + inner + right
         elif isinstance(arg, tuple):
-            left, right = "()"
+            # Tuples: use parentheses, add trailing comma for single element
+            if len(arg) == 1:
+                return "(" + _recursive_to_string(doprint, arg[0]) + ",)"
+            inner = ', '.join(_recursive_to_string(doprint, e) for e in arg)
+            return "(" + inner + ")"
         else:
             raise NotImplementedError("unhandled type: %s, %s" % (type(arg), arg))
-        return left +', '.join(_recursive_to_string(doprint, e) for e in arg) + right
     elif isinstance(arg, str):
         return arg
     else:
