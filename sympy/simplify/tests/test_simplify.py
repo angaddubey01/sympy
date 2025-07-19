@@ -164,6 +164,8 @@ def test_simplify_complex():
     # issue 10124
     assert simplify(exp(Matrix([[0, -1], [1, 0]]))) == Matrix([[cos(1),
         -sin(1)], [sin(1), cos(1)]])
+    # simplify of complex exponent should be unchanged (GitHub issue)
+    assert simplify(cos(x)**I) == cos(x)**I
 
 
 def test_simplify_ratio():
