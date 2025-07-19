@@ -190,10 +190,23 @@ class UnitSystem(_QuantityMapper):
                 dim /= idim**count
             return factor, dim
         elif isinstance(expr, Function):
-            fds = [self._collect_factor_and_dimension(
-                arg) for arg in expr.args]
-            return (expr.func(*(f[0] for f in fds)),
-                    *(d[1] for d in fds))
+            # Generic functions: apply to the argument factors and propagate dimensions,
+            # but collapse dimensionless results to Dimension(1).
+            fds = [self._collect_factor_and_dimension(arg) for arg in expr.args]
+            # build factor by applying function to the factors of the arguments
+            factor = expr.func(*(f[0] for f in fds))
+            # extract argument dimensions
+            arg_dims = [d for (_, d) in fds]
+            # single-argument functions: result dimension equals argument dimension,
+            # collapse to dimensionless if appropriate
+            if len(arg_dims) == 1:
+                dim = arg_dims[0]
+                if self.get_dimension_system().is_dimensionless(dim):
+                    dim = Dimension(1)
+            else:
+                # multi-argument functions: keep tuple of argument dimensions
+                dim = arg_dims
+            return factor, dim
         elif isinstance(expr, Dimension):
             return S.One, expr
         else:
