@@ -553,6 +553,38 @@ def test_prefixed_property():
     assert kilogram.is_prefixed
     assert pebibyte.is_prefixed
 
+def test_dimensionless_functions():
+    """Test that functions of dimensionless quantities are handled correctly."""
+    from sympy.core.singleton import S
+    from sympy.physics.units.definitions import second, ohm, farad
+    
+    # Test second/(ohm*farad) which should be dimensionless
+    expr = second / (ohm * farad)
+    dim = SI._collect_factor_and_dimension(expr)[1]
+    assert SI.get_dimension_system().is_dimensionless(dim)
+    
+    # Test that exp of a dimensionless quantity is dimensionless
+    exp_expr = exp(expr)
+    exp_factor, exp_dim = SI._collect_factor_and_dimension(exp_expr)
+    assert SI.get_dimension_system().is_dimensionless(exp_dim)
+    
+    # Test that a scalar + exp of a dimensionless quantity is dimensionless
+    buggy_expr = 100 + exp(expr)
+    buggy_factor, buggy_dim = SI._collect_factor_and_dimension(buggy_expr)
+    assert SI.get_dimension_system().is_dimensionless(buggy_dim)
+    assert buggy_factor == 100 + S.Exp1
+    assert buggy_dim == Dimension(1)
+    
+    # Test other transcendental functions
+    log_expr = log(expr)
+    log_factor, log_dim = SI._collect_factor_and_dimension(log_expr)
+    assert SI.get_dimension_system().is_dimensionless(log_dim)
+    
+    sin_expr = sin(expr)
+    sin_factor, sin_dim = SI._collect_factor_and_dimension(sin_expr)
+    assert SI.get_dimension_system().is_dimensionless(sin_dim)
+
+
 def test_physics_constant():
     from sympy.physics.units import definitions
 

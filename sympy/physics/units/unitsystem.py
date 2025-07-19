@@ -192,6 +192,12 @@ class UnitSystem(_QuantityMapper):
         elif isinstance(expr, Function):
             fds = [self._collect_factor_and_dimension(
                 arg) for arg in expr.args]
+            # For transcendental functions like exp, log, sin, etc.,
+            # if all arguments are dimensionless (after checking),
+            # the function result is also dimensionless
+            if all(self.get_dimension_system().is_dimensionless(d[1]) for d in fds):
+                return expr.func(*(f[0] for f in fds)), Dimension(1)
+            # Otherwise, return the original behavior
             return (expr.func(*(f[0] for f in fds)),
                     *(d[1] for d in fds))
         elif isinstance(expr, Dimension):
