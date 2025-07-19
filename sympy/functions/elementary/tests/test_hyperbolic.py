@@ -272,6 +272,10 @@ def test_coth():
 
     assert coth(k*pi*I) == -cot(k*pi)*I
 
+def test_coth_subs_log_tan():
+    x = Symbol('x')
+    e = coth(log(tan(x)))
+    assert e.subs(x, 2) == coth(log(-tan(2)))
 
 def test_coth_series():
     x = Symbol('x')

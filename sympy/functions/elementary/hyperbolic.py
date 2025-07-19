@@ -587,9 +587,9 @@ class coth(HyperbolicFunction):
                 x, m = _peeloff_ipi(arg)
                 if m:
                     cothm = coth(m)
-                    if cotm is S.ComplexInfinity:
+                    if cothm is S.ComplexInfinity:
                         return coth(x)
-                    else: # cothm == 0
+                    else:  # cothm == 0
                         return tanh(x)
 
             if arg.func == asinh:
