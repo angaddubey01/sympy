@@ -3003,6 +3003,13 @@ def test_issue_11238():
     assert m2.rank(simplify=True) == 1
     assert m3.rank(simplify=True) == 1
 
+def test_det_bareiss_nan_fallback():
+    a = symbols('a')
+    m = Matrix([[i + a*j for i in range(5)] for j in range(5)])
+    det = m.det()
+    assert not det.has(S.NaN)
+    assert det.simplify() == 0
+
 def test_as_real_imag():
     m1 = Matrix(2,2,[1,2,3,4])
     m2 = m1*S.ImaginaryUnit

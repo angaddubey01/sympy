@@ -422,7 +422,18 @@ class MatrixDeterminant(MatrixCommon):
                    - self[0, 1] * self[1, 0] * self[2, 2])
 
         if method == "bareiss":
-            return self._eval_det_bareiss()
+            try:
+                rv = self._eval_det_bareiss()
+            except (TypeError, ValueError):
+                rv = self._eval_det_berkowitz()
+            else:
+                try:
+                    has_nan = rv.has(S.NaN)
+                except Exception:
+                    has_nan = False
+                if has_nan:
+                    rv = self._eval_det_berkowitz()
+            return rv
         elif method == "berkowitz":
             return self._eval_det_berkowitz()
         elif method == "lu":
