@@ -1,7 +1,7 @@
 import sympy
 import tempfile
 import os
-from sympy import symbols, Eq, Mod
+from sympy import symbols, Eq, Mod, MatrixSymbol, S
 from sympy.external import import_module
 from sympy.tensor import IndexedBase, Idx
 from sympy.utilities.autowrap import autowrap, ufuncify, CodeWrapError
@@ -249,6 +249,13 @@ def test_issue_10274_C_cython():
 def test_issue_15337_C_cython():
     has_module('Cython')
     runtest_issue_15337('C89', 'cython')
+
+
+def test_autowrap_unused_array_argument():
+    has_module('Cython')
+    x = MatrixSymbol('x', 2, 1)
+    f = autowrap(S(1), args=(x,), backend='cython')
+    assert f(numpy.array([[1.0], [2.0]])) == 1.0
 
 
 def test_autowrap_custom_printer():

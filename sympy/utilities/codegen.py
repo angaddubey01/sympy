@@ -719,11 +719,18 @@ class CodeGen(object):
         if argument_sequence is not None:
             # if the user has supplied IndexedBase instances, we'll accept that
             new_sequence = []
+            dims_lookup = {}
             for arg in argument_sequence:
                 if isinstance(arg, IndexedBase):
                     new_sequence.append(arg.label)
+                    if arg.shape is not None:
+                        dims_lookup[arg.label] = [
+                            (S.Zero, dim - 1) for dim in arg.shape]
                 else:
                     new_sequence.append(arg)
+                    if isinstance(arg, MatrixSymbol):
+                        dims_lookup[arg] = [
+                            (S.Zero, dim - 1) for dim in arg.shape]
             argument_sequence = new_sequence
 
             missing = [x for x in arg_list if x.name not in argument_sequence]
@@ -739,7 +746,10 @@ class CodeGen(object):
                 try:
                     new_args.append(name_arg_dict[symbol])
                 except KeyError:
-                    new_args.append(InputArgument(symbol))
+                    metadata = {}
+                    if symbol in dims_lookup:
+                        metadata = {'dimensions': dims_lookup[symbol]}
+                    new_args.append(InputArgument(symbol, **metadata))
             arg_list = new_args
 
         return Routine(name, arg_list, return_val, local_vars, global_vars)
@@ -1382,11 +1392,18 @@ class JuliaCodeGen(CodeGen):
         if argument_sequence is not None:
             # if the user has supplied IndexedBase instances, we'll accept that
             new_sequence = []
+            dims_lookup = {}
             for arg in argument_sequence:
                 if isinstance(arg, IndexedBase):
                     new_sequence.append(arg.label)
+                    if arg.shape is not None:
+                        dims_lookup[arg.label] = [
+                            (S.One, dim) for dim in arg.shape]
                 else:
                     new_sequence.append(arg)
+                    if isinstance(arg, MatrixSymbol):
+                        dims_lookup[arg] = [
+                            (S.One, dim) for dim in arg.shape]
             argument_sequence = new_sequence
 
             missing = [x for x in arg_list if x.name not in argument_sequence]
@@ -1402,7 +1419,10 @@ class JuliaCodeGen(CodeGen):
                 try:
                     new_args.append(name_arg_dict[symbol])
                 except KeyError:
-                    new_args.append(InputArgument(symbol))
+                    metadata = {}
+                    if symbol in dims_lookup:
+                        metadata = {'dimensions': dims_lookup[symbol]}
+                    new_args.append(InputArgument(symbol, **metadata))
             arg_list = new_args
 
         return Routine(name, arg_list, return_vals, local_vars, global_vars)
@@ -1590,11 +1610,18 @@ class OctaveCodeGen(CodeGen):
         if argument_sequence is not None:
             # if the user has supplied IndexedBase instances, we'll accept that
             new_sequence = []
+            dims_lookup = {}
             for arg in argument_sequence:
                 if isinstance(arg, IndexedBase):
                     new_sequence.append(arg.label)
+                    if arg.shape is not None:
+                        dims_lookup[arg.label] = [
+                            (S.One, dim) for dim in arg.shape]
                 else:
                     new_sequence.append(arg)
+                    if isinstance(arg, MatrixSymbol):
+                        dims_lookup[arg] = [
+                            (S.One, dim) for dim in arg.shape]
             argument_sequence = new_sequence
 
             missing = [x for x in arg_list if x.name not in argument_sequence]
@@ -1610,7 +1637,10 @@ class OctaveCodeGen(CodeGen):
                 try:
                     new_args.append(name_arg_dict[symbol])
                 except KeyError:
-                    new_args.append(InputArgument(symbol))
+                    metadata = {}
+                    if symbol in dims_lookup:
+                        metadata = {'dimensions': dims_lookup[symbol]}
+                    new_args.append(InputArgument(symbol, **metadata))
             arg_list = new_args
 
         return Routine(name, arg_list, return_vals, local_vars, global_vars)
@@ -1821,11 +1851,18 @@ class RustCodeGen(CodeGen):
         if argument_sequence is not None:
             # if the user has supplied IndexedBase instances, we'll accept that
             new_sequence = []
+            dims_lookup = {}
             for arg in argument_sequence:
                 if isinstance(arg, IndexedBase):
                     new_sequence.append(arg.label)
+                    if arg.shape is not None:
+                        dims_lookup[arg.label] = [
+                            (S.One, dim) for dim in arg.shape]
                 else:
                     new_sequence.append(arg)
+                    if isinstance(arg, MatrixSymbol):
+                        dims_lookup[arg] = [
+                            (S.One, dim) for dim in arg.shape]
             argument_sequence = new_sequence
 
             missing = [x for x in arg_list if x.name not in argument_sequence]
@@ -1841,7 +1878,10 @@ class RustCodeGen(CodeGen):
                 try:
                     new_args.append(name_arg_dict[symbol])
                 except KeyError:
-                    new_args.append(InputArgument(symbol))
+                    metadata = {}
+                    if symbol in dims_lookup:
+                        metadata = {'dimensions': dims_lookup[symbol]}
+                    new_args.append(InputArgument(symbol, **metadata))
             arg_list = new_args
 
         return Routine(name, arg_list, return_vals, local_vars, global_vars)

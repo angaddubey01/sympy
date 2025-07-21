@@ -1,6 +1,6 @@
 from sympy.core import symbols, Eq, pi, Catalan, Lambda, Dummy
 from sympy.core.compatibility import StringIO
-from sympy import erf, Integral, Symbol
+from sympy import erf, Integral, Symbol, S
 from sympy import Equality
 from sympy.matrices import Matrix, MatrixSymbol
 from sympy.utilities.codegen import (
@@ -27,6 +27,14 @@ def get_string(dump_fn, routines, prefix="file", header=False, empty=False):
     source = output.getvalue()
     output.close()
     return source
+
+
+def test_codegen_unused_matrix_argument():
+    gen = C99CodeGen()
+    x = MatrixSymbol('x', 2, 1)
+    routine = gen.routine('foo', S(1.0), argument_sequence=[x])
+    proto = gen.get_prototype(routine)
+    assert proto == 'double foo(double *x)'
 
 
 def test_Routine_argument_order():
