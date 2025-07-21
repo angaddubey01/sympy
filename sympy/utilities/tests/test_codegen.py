@@ -56,6 +56,14 @@ def test_Routine_argument_order():
     assert [ arg.name for arg in r.arguments ] == [z, x, a, y]
 
 
+def test_c_code_unused_matrix_argument():
+    x = MatrixSymbol('x', 2, 1)
+    code_gen = CCodeGen()
+    routine = code_gen.routine('test', 1.0, argument_sequence=(x,))
+    prototype = code_gen.get_prototype(routine)
+    assert prototype == 'double test(double *x)'
+
+
 def test_empty_c_code():
     code_gen = C89CodeGen()
     source = get_string(code_gen.dump_c, [])
