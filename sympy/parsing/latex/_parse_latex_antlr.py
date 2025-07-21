@@ -382,11 +382,10 @@ def convert_frac(frac):
 
     expr_top = convert_expr(frac.upper)
     expr_bot = convert_expr(frac.lower)
-    inverse_denom = sympy.Pow(expr_bot, -1, evaluate=False)
-    if expr_top == 1:
-        return inverse_denom
-    else:
-        return sympy.Mul(expr_top, inverse_denom, evaluate=False)
+    
+    # Create a properly grouped fraction expression that preserves the structure
+    # when nested fractions are used
+    return sympy.Mul(expr_top, sympy.Pow(expr_bot, -1, evaluate=False), evaluate=False)
 
 def convert_binom(binom):
     expr_n = convert_expr(binom.n)
