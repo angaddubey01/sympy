@@ -2972,6 +2972,14 @@ def test_partial_pivoting():
     assert (m_mixed.inv() - m_inv).norm() < 1e-15
     assert (m_float.inv() - m_inv).norm() < 1e-15
 
+
+def test_determinant_invalid_nan_comparison_issue():
+    # determinant of a symbolic matrix should not raise Invalid NaN comparison
+    from sympy.abc import a
+    M = Matrix([[i + a*j for i in range(6)] for j in range(6)])
+    assert M.det() == S.NaN
+    assert M.det(method='berkowitz').simplify() == 0
+
 def test_iszero_substitution():
     """ When doing numerical computations, all elements that pass
     the iszerofunc test should be set to numerically zero if they
