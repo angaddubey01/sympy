@@ -67,6 +67,18 @@ def parse_latex(sympy):
                           " antlr4-python3-runtime) or"
                           " conda (antlr-python-runtime)")
 
+    # Ensure parser and lexer are loaded (might have failed at import if antlr4 was missing)
+    global LaTeXParser, LaTeXLexer
+    if LaTeXParser is None or LaTeXLexer is None:
+        # import grammar-generated parser and lexer now that antlr4 is available
+        LaTeXParser = import_module(
+            'sympy.parsing.latex._antlr.latexparser',
+            import_kwargs={'fromlist': ['LaTeXParser']}
+        ).LaTeXParser
+        LaTeXLexer = import_module(
+            'sympy.parsing.latex._antlr.latexlexer',
+            import_kwargs={'fromlist': ['LaTeXLexer']}
+        ).LaTeXLexer
     matherror = MathErrorListener(sympy)
 
     stream = antlr4.InputStream(sympy)
@@ -384,7 +396,8 @@ def convert_frac(frac):
     expr_bot = convert_expr(frac.lower)
     inverse_denom = sympy.Pow(expr_bot, -1, evaluate=False)
     if expr_top == 1:
-        return inverse_denom
+        # wrap in Mul to enforce proper grouping for complex denominators (as with slash division)
+        return sympy.Mul(1, inverse_denom, evaluate=False)
     else:
         return sympy.Mul(expr_top, inverse_denom, evaluate=False)
 
