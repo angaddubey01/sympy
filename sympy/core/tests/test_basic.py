@@ -39,6 +39,22 @@ def test_equality():
     assert not(Basic() == 0)
 
 
+def test_basic_eq_notimplemented_with_unknown_type():
+    class Foo:
+        def __init__(self, obj):
+            self.obj = obj
+        def __eq__(self, other):
+            if isinstance(other, Basic):
+                return self.obj is other
+            return NotImplemented
+
+    b = Basic()
+    f = Foo(b)
+    assert Basic.__eq__(b, f) is NotImplemented
+    assert b == f
+    assert f == b
+
+
 def test_matches_basic():
     instances = [Basic(b1, b1, b2), Basic(b1, b2, b1), Basic(b2, b1, b1),
                  Basic(b1, b2), Basic(b2, b1), b2, b1]
