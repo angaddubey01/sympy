@@ -38,6 +38,17 @@ def test_equality():
     assert Basic() != 0
     assert not(Basic() == 0)
 
+    class Foo:
+        def __eq__(self, other):
+            if isinstance(other, Basic):
+                return True
+            return NotImplemented
+
+    foo = Foo()
+    b = Basic()
+    assert foo == b
+    assert b == foo
+
 
 def test_matches_basic():
     instances = [Basic(b1, b1, b2), Basic(b1, b2, b1), Basic(b2, b1, b1),
