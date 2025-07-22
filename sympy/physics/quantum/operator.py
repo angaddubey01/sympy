@@ -306,8 +306,12 @@ class IdentityOperator(Operator):
         return r'{\mathcal{I}}'
 
     def __mul__(self, other):
+        """Return ``other`` for noncommutative arguments."""
 
         if isinstance(other, Operator):
+            return other
+
+        if isinstance(other, Expr) and not other.is_commutative:
             return other
 
         return Mul(self, other)
