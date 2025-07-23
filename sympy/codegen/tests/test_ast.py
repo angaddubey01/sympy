@@ -266,6 +266,9 @@ def test_String():
     assert st.is_Atom
     assert st == String('foobar')
     assert st.text == 'foobar'
+    from sympy.core.symbol import Str
+    assert st.args == (Str('foobar'),)
+    assert st.func(*st.args) == st
     assert st.func(**st.kwargs()) == st
 
 

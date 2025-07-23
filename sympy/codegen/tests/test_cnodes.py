@@ -78,7 +78,8 @@ def test_sizeof():
     assert ccode(sz) == 'sizeof(%s)' % typename
     assert sz.func(*sz.args) == sz
     assert not sz.is_Atom
-    assert sz.atoms() == {String('unsigned int'), String('sizeof')}
+    from sympy.core.symbol import Str
+    assert sz.atoms() == {Str('unsigned int'), Str('sizeof')}
 
 
 def test_struct():

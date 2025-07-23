@@ -895,14 +895,32 @@ class String(Token):
 
     """
     __slots__ = ('text',)
-    not_in_args = ['text']
+
     is_Atom = True
 
-    @classmethod
-    def _construct_text(cls, text):
-        if not isinstance(text, str):
+    def __new__(cls, text=None, **kwargs):
+        if text is None and 'text' in kwargs:
+            text = kwargs.pop('text')
+        elif text is not None and 'text' in kwargs:
+            raise TypeError("Got multiple values for argument 'text'")
+        if kwargs:
+            raise ValueError("Unknown keyword arguments: %s" % ' '.join(kwargs))
+        if text is None:
+            raise TypeError("No value for 'text' given")
+        if isinstance(text, cls):
+            return text
+        from sympy.core.symbol import Str
+        if isinstance(text, Str):
+            str_obj = text
+            text_str = text.name
+        elif isinstance(text, str):
+            str_obj = Str(text)
+            text_str = text
+        else:
             raise TypeError("Argument text is not a string type.")
-        return text
+        obj = CodegenAST.__new__(cls, str_obj)
+        obj.text = text_str
+        return obj
 
     def _sympystr(self, printer, *args, **kwargs):
         return self.text
