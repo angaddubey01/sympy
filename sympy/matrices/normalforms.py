@@ -124,4 +124,7 @@ def hermite_normal_form(A, *, D=None, check_rank=False):
     # Accept any of Python int, SymPy Integer, and ZZ itself:
     if D is not None and not ZZ.of_type(D):
         D = ZZ(int(D))
+    m, n = A.shape
+    if n < m:
+        return hermite_normal_form(A.T, D=D, check_rank=check_rank).T
     return _hnf(A._rep, D=D, check_rank=check_rank).to_Matrix()

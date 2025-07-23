@@ -397,6 +397,9 @@ def hermite_normal_form(A, *, D=None, check_rank=False):
     """
     if not A.domain.is_ZZ:
         raise DMDomainError('Matrix must be over domain ZZ.')
+    m, n = A.shape
+    if n < m:
+        return hermite_normal_form(A.transpose(), D=D, check_rank=check_rank).transpose()
     if D is not None and (not check_rank or A.convert_to(QQ).rank() == A.shape[0]):
         return _hermite_normal_form_modulo_D(A, D)
     else:

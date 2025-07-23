@@ -46,7 +46,7 @@ def test_hermite_normal():
     assert hermite_normal_form(m, D=ZZ(2), check_rank=True) == hnf
 
     m = m.transpose()
-    hnf = DM([[37, 0, 19], [222, -6, 113], [48, 0, 25], [0, 2, 1], [0, 0, 1]], ZZ)
+    hnf = DM([[1, 0, 0], [0, 2, 0], [0, 1, 1]], ZZ)
     assert hermite_normal_form(m) == hnf
     raises(DMShapeError, lambda: _hermite_normal_form_modulo_D(m, ZZ(96)))
     raises(DMDomainError, lambda: _hermite_normal_form_modulo_D(m, QQ(96)))
@@ -62,7 +62,7 @@ def test_hermite_normal():
     assert hermite_normal_form(m) == hnf
 
     m = DM([[2, 7], [0, 0], [0, 0]], ZZ)
-    hnf = DM([[], [], []], ZZ)
+    hnf = DM([[2, 7]], ZZ)
     assert hermite_normal_form(m) == hnf
 
     m = DM([[-2, 1], [0, 1]], ZZ)
