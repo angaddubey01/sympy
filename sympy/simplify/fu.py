@@ -501,24 +501,27 @@ def _TR56(rv, f, g, h, max, pow):
         if not (rv.is_Pow and rv.base.func == f):
             return rv
 
-        if (rv.exp < 0) == True:
+        exp = rv.exp
+        if exp.is_real is False:
             return rv
-        if (rv.exp > max) == True:
+        if (exp < 0) == True:
             return rv
-        if rv.exp == 2:
+        if (exp > max) == True:
+            return rv
+        if exp == 2:
             return h(g(rv.base.args[0])**2)
         else:
-            if rv.exp == 4:
+            if exp == 4:
                 e = 2
             elif not pow:
-                if rv.exp % 2:
+                if exp % 2:
                     return rv
-                e = rv.exp//2
+                e = exp//2
             else:
-                p = perfect_power(rv.exp)
+                p = perfect_power(exp)
                 if not p:
                     return rv
-                e = rv.exp//2
+                e = exp//2
             return h(g(rv.base.args[0])**2)**e
 
     return bottom_up(rv, _f)

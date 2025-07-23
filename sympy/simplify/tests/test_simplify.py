@@ -165,6 +165,9 @@ def test_simplify_complex():
     assert simplify(exp(Matrix([[0, -1], [1, 0]]))) == Matrix([[cos(1),
         -sin(1)], [sin(1), cos(1)]])
 
+    # regression test for complex exponent
+    assert simplify(cos(x)**I) == cos(x)**I
+
 
 def test_simplify_ratio():
     # roots of x**3-3*x+5
