@@ -277,16 +277,12 @@ class Product(ExprWithIntLimits):
         elif term.is_Add:
             p, q = term.as_numer_denom()
             q = self._eval_product(q, (k, a, n))
-            if q.is_Number:
-
-                # There is expression, which couldn't change by
-                # as_numer_denom(). E.g. n**(2/3) + 1 --> (n**(2/3) + 1, 1).
-                # We have to catch this case.
-
-                p = sum([self._eval_product(i, (k, a, n)) for i in p.as_coeff_Add()])
-            else:
-                p = self._eval_product(p, (k, a, n))
-            return p / q
+            p_eval = None
+            if p != term:
+                p_eval = self._eval_product(p, (k, a, n))
+            if p_eval is not None and q is not None:
+                return p_eval / q
+            return None
 
         elif term.is_Mul:
             exclude, include = [], []

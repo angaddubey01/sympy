@@ -242,6 +242,13 @@ def test_product_pow():
     assert product(2**(2*f(k)), (k, 1, n)) == 2**Sum(2*f(k), (k, 1, n))
 
 
+def test_product_add_no_evaluation():
+    from sympy.abc import n, k
+    p = Product(n + 1/2**k, (k, 0, n-1))
+    assert p.doit() == p
+    assert p.subs(n, 2).doit() == Rational(15, 2)
+
+
 def test_infinite_product():
     # issue 5737
     assert isinstance(Product(2**(1/factorial(n)), (n, 0, oo)), Product)
