@@ -132,6 +132,7 @@ from collections import defaultdict
 
 from sympy.core.relational import (Ge, Gt, Le, Lt)
 from sympy.core import Symbol, Tuple, Dummy
+from sympy.core.symbol import Str
 from sympy.core.basic import Basic
 from sympy.core.expr import Expr
 from sympy.core.numbers import Float, Integer, oo
@@ -895,11 +896,36 @@ class String(Token):
 
     """
     __slots__ = ('text',)
+    # ``text`` is stored outside of ``args`` but ``args`` are represented by a
+    # ``Str`` instance so that ``expr.func(*expr.args) == expr`` holds. The
+    # object still behaves as atomic for other algorithms.
     not_in_args = ['text']
     is_Atom = True
 
+    def __new__(cls, text):
+        return super().__new__(cls, text)
+
+    @property
+    def args(self):
+        return (Str(self.text),)
+
+    @property
+    def _argset(self):
+        return ()
+
+    def atoms(self, *types):
+        if types:
+            types = tuple(t if isinstance(t, type) else type(t) for t in types)
+            if isinstance(self, types):
+                return {self}
+            else:
+                return set()
+        return {self}
+
     @classmethod
     def _construct_text(cls, text):
+        if isinstance(text, Str):
+            text = text.name
         if not isinstance(text, str):
             raise TypeError("Argument text is not a string type.")
         return text

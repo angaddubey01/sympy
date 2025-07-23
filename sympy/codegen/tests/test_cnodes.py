@@ -78,7 +78,7 @@ def test_sizeof():
     assert ccode(sz) == 'sizeof(%s)' % typename
     assert sz.func(*sz.args) == sz
     assert not sz.is_Atom
-    assert sz.atoms() == {String('unsigned int'), String('sizeof')}
+    assert sz.atoms(String) == {String('unsigned int'), String('sizeof')}
 
 
 def test_struct():
