@@ -277,15 +277,18 @@ class Product(ExprWithIntLimits):
         elif term.is_Add:
             p, q = term.as_numer_denom()
             q = self._eval_product(q, (k, a, n))
+            if q is None:
+                return None
+            # The general product of a sum cannot in general be
+            # simplified.  Previously this branch attempted to expand
+            # ``p`` using ``as_coeff_Add`` which led to incorrect
+            # evaluations such as ``Product(n + 1/2**k)``.  Instead of
+            # returning a wrong result we bail out here.
             if q.is_Number:
-
-                # There is expression, which couldn't change by
-                # as_numer_denom(). E.g. n**(2/3) + 1 --> (n**(2/3) + 1, 1).
-                # We have to catch this case.
-
-                p = sum([self._eval_product(i, (k, a, n)) for i in p.as_coeff_Add()])
-            else:
-                p = self._eval_product(p, (k, a, n))
+                return None
+            p = self._eval_product(p, (k, a, n))
+            if p is None:
+                return None
             return p / q
 
         elif term.is_Mul:

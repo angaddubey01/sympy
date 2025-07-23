@@ -247,6 +247,12 @@ def test_infinite_product():
     assert isinstance(Product(2**(1/factorial(n)), (n, 0, oo)), Product)
 
 
+def test_product_add_nonpolynomial():
+    p = Product(n + 1/2**k, (k, 0, n-1))
+    assert p.doit() == p
+    assert p.subs(n, 2).doit() == Rational(15, 2)
+
+
 def test_conjugate_transpose():
     p = Product(x**k, (k, 1, 3))
     assert p.adjoint().doit() == p.doit().adjoint()
