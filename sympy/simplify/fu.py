@@ -501,6 +501,12 @@ def _TR56(rv, f, g, h, max, pow):
         if not (rv.is_Pow and rv.base.func == f):
             return rv
 
+        # If the exponent is known to be non-real (e.g. ``I``) then none of
+        # the comparisons made below are valid and evaluating them can raise a
+        # ``TypeError``.  In that case just return ``rv`` unchanged.
+        # See sympy issue #24249.
+        if rv.exp.is_real is False:
+            return rv
         if (rv.exp < 0) == True:
             return rv
         if (rv.exp > max) == True:
