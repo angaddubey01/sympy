@@ -6,6 +6,7 @@ from sympy.polys.matrices.normalforms import (
     hermite_normal_form, _hermite_normal_form, _hermite_normal_form_modulo_D)
 from sympy.polys.domains import ZZ, QQ
 from sympy.polys.matrices import DomainMatrix, DM
+from sympy import Matrix
 from sympy.polys.matrices.exceptions import DMDomainError, DMShapeError
 
 
@@ -40,7 +41,7 @@ def test_smith_normal():
 
 def test_hermite_normal():
     m = DM([[2, 7, 17, 29, 41], [3, 11, 19, 31, 43], [5, 13, 23, 37, 47]], ZZ)
-    hnf = DM([[1, 0, 0], [0, 2, 1], [0, 0, 1]], ZZ)
+    hnf = DM([[0, 0, 1, 0, 0], [0, 0, 0, 2, 1], [0, 0, 0, 0, 1]], ZZ)
     assert hermite_normal_form(m) == hnf
     assert hermite_normal_form(m, D=ZZ(2)) == hnf
     assert hermite_normal_form(m, D=ZZ(2), check_rank=True) == hnf
@@ -52,18 +53,28 @@ def test_hermite_normal():
     raises(DMDomainError, lambda: _hermite_normal_form_modulo_D(m, QQ(96)))
 
     m = DM([[8, 28, 68, 116, 164], [3, 11, 19, 31, 43], [5, 13, 23, 37, 47]], ZZ)
-    hnf = DM([[4, 0, 0], [0, 2, 1], [0, 0, 1]], ZZ)
+    hnf = DM([[0, 0, 4, 0, 0], [0, 0, 0, 2, 1], [0, 0, 0, 0, 1]], ZZ)
     assert hermite_normal_form(m) == hnf
     assert hermite_normal_form(m, D=ZZ(8)) == hnf
     assert hermite_normal_form(m, D=ZZ(8), check_rank=True) == hnf
 
     m = DM([[10, 8, 6, 30, 2], [45, 36, 27, 18, 9], [5, 4, 3, 2, 1]], ZZ)
-    hnf = DM([[26, 2], [0, 9], [0, 1]], ZZ)
+    hnf = DM([[0, 0, 0, 26, 2], [0, 0, 0, 0, 9], [0, 0, 0, 0, 1]], ZZ)
     assert hermite_normal_form(m) == hnf
 
     m = DM([[2, 7], [0, 0], [0, 0]], ZZ)
-    hnf = DM([[], [], []], ZZ)
+    hnf = DM([[0, 1], [0, 0], [0, 0]], ZZ)
     assert hermite_normal_form(m) == hnf
+
+
+def test_hermite_normal_no_row_removal_domainmatrix():
+    m = DM([[5, 8, 12], [0, 0, 1]], ZZ)
+    flipped = DM([[1, 0, 0], [12, 8, 5]], ZZ)  # equivalent to flip
+    h = hermite_normal_form(flipped.transpose()).transpose()
+    h_mat = h.to_Matrix()
+    result_mat = h_mat.tolist()
+    result_mat = [row[::-1] for row in result_mat[::-1]]
+    assert Matrix(result_mat) == Matrix([[5, 8, 0], [0, 0, 1]])
 
     m = DM([[-2, 1], [0, 1]], ZZ)
     hnf = DM([[2, 1], [0, 1]], ZZ)

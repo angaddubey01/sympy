@@ -205,16 +205,18 @@ def _hermite_normal_form(A):
     if not A.domain.is_ZZ:
         raise DMDomainError('Matrix must be over domain ZZ.')
     # We work one row at a time, starting from the bottom row, and working our
-    # way up. The total number of rows we will consider is min(m, n), where
-    # A is an m x n matrix.
+    # way up.  For correctness when the bottom rows are zero but non-zero rows
+    # appear higher up, we process *all* rows (or until we have placed pivots
+    # in every column).
     m, n = A.shape
-    rows = min(m, n)
     A = A.to_dense().rep.copy()
     # Our goal is to put pivot entries in the rightmost columns.
     # Invariant: Before processing each row, k should be the index of the
     # leftmost column in which we have so far put a pivot.
     k = n
-    for i in range(m - 1, m - 1 - rows, -1):
+    for i in range(m - 1, -1, -1):
+        if k == 0:
+            break
         k -= 1
         # k now points to the column in which we want to put a pivot.
         # We want zeros in all entries to the left of the pivot column.
@@ -243,9 +245,8 @@ def _hermite_normal_form(A):
             for j in range(k + 1, n):
                 q = A[i][j] // b
                 add_columns(A, j, k, 1, -q, 0, 1)
-    # Finally, the HNF consists of those columns of A in which we succeeded in making
-    # a nonzero pivot.
-    return DomainMatrix.from_rep(A)[:, k:]
+    # Finally, return the whole matrix including any zero columns on the left.
+    return DomainMatrix.from_rep(A)
 
 
 def _hermite_normal_form_modulo_D(A, D):
@@ -333,7 +334,11 @@ def _hermite_normal_form_modulo_D(A, D):
             q = W[i][j] // W[i][i]
             add_columns(W, j, i, 1, -q, 0, 1)
         R //= d
-    return DomainMatrix(W, (m, m), ZZ).to_dense()
+    result = DomainMatrix(W, (m, m), ZZ).to_dense()
+    if n > m:
+        zeros = DomainMatrix.zeros((m, n - m), ZZ).to_dense()
+        result = zeros.hstack(result)
+    return result
 
 
 def hermite_normal_form(A, *, D=None, check_rank=False):
