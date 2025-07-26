@@ -41,7 +41,7 @@ from sympy.polys.densebasic import (
     dup_normal, dmp_normal,
     dup_convert, dmp_convert,
     dmp_from_sympy,
-    dup_strip,
+    dup_strip, dmp_strip,
     dup_degree, dmp_degree_in,
     dmp_degree_list,
     dmp_negative_p,
@@ -586,6 +586,8 @@ class DMP(PicklableWithSlots, CantSympify):
     def clear_denoms(f):
         """Clear denominators, but keep the ground domain. """
         coeff, F = dmp_clear_denoms(f.rep, f.lev, f.dom)
+        # strip leading zeros to normalize zero polynomial representation
+        F = dmp_strip(F, f.lev)
         return coeff, f.per(F)
 
     def integrate(f, m=1, j=0):

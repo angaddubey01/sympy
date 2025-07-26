@@ -1444,6 +1444,15 @@ def test_Poly_clear_denoms():
     assert coeff == 3 and poly == Poly(
         x + 3*sqrt(2), x, domain='EX') and poly.get_domain() == EX
 
+def test_Poly_clear_denoms_zero_strip():
+    x = Symbol('x')
+    # clearing denominators of zero polynomial should strip zero representation
+    coeff, poly = Poly(0, x, domain=EX).clear_denoms()
+    assert coeff == 1
+    # underlying representation should be empty list for zero polynomial
+    assert poly.rep.rep == []
+    assert poly.is_zero
+
 
 def test_Poly_rat_clear_denoms():
     f = Poly(x**2/y + 1, x)
