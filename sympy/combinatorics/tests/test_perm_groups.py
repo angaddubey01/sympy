@@ -863,6 +863,10 @@ def test_sylow_subgroup():
     S = P.sylow_subgroup(3)
     assert S.order() == 3
 
+    P = DihedralGroup(18)
+    S = P.sylow_subgroup(2)
+    assert S.order() == 4
+
     P = PermutationGroup(Permutation(1, 5)(2, 4), Permutation(0, 1, 2, 3, 4, 5), Permutation(0, 2))
     S = P.sylow_subgroup(3)
     assert S.order() == 9
