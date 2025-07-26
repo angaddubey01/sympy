@@ -63,9 +63,10 @@ class DenseNDimArray(NDimArray):
         else:
             if isinstance(index, slice):
                 return self._array[index]
-            else:
-                index = self._parse_index(index)
-                return self._array[index]
+            index = self._parse_index(index)
+            if index >= len(self._array):
+                raise ValueError('index out of range')
+            return self._array[index]
 
     @classmethod
     def zeros(cls, *shape):
@@ -149,7 +150,7 @@ class ImmutableDenseNDimArray(DenseNDimArray, ImmutableNDimArray):
         self._shape = shape
         self._array = list(flat_list)
         self._rank = len(shape)
-        self._loop_size = functools.reduce(lambda x,y: x*y, shape) if shape else 0
+        self._loop_size = functools.reduce(lambda x, y: x*y, shape, 1)
         return self
 
     def __setitem__(self, index, value):
@@ -174,7 +175,7 @@ class MutableDenseNDimArray(DenseNDimArray, MutableNDimArray):
         self._shape = shape
         self._array = list(flat_list)
         self._rank = len(shape)
-        self._loop_size = functools.reduce(lambda x,y: x*y, shape) if shape else 0
+        self._loop_size = functools.reduce(lambda x, y: x*y, shape, 1)
         return self
 
     def __setitem__(self, index, value):
