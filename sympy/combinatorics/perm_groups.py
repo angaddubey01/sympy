@@ -2195,15 +2195,22 @@ class PermutationGroup(Basic):
                 # respect to the already discovere ones
                 minimal = True
                 to_remove = []
+                to_remove_indices = []
                 for i, r in enumerate(rep_blocks):
                     if len(r) > len(rep) and rep.issubset(r):
                         # i-th block system is not minimal
-                        del num_blocks[i], blocks[i]
                         to_remove.append(rep_blocks[i])
+                        to_remove_indices.append(i)
                     elif len(r) < len(rep) and r.issubset(rep):
                         # the system being checked is not minimal
                         minimal = False
                         break
+                
+                # Remove items using the collected indices (in reverse order to preserve indices)
+                for i in sorted(to_remove_indices, reverse=True):
+                    del num_blocks[i]
+                    del blocks[i]
+                
                 # remove non-minimal representative blocks
                 rep_blocks = [r for r in rep_blocks if r not in to_remove]
 
