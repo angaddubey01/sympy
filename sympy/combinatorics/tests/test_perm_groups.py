@@ -905,6 +905,15 @@ def test_sylow_subgroup():
     assert G.order() % S.order() == 0
     assert G.order()/S.order() % 2 > 0
 
+    # test for DihedralGroup sylow_subgroup IndexError cases
+    G = DihedralGroup(18)
+    S2 = G.sylow_subgroup(2)
+    assert S2.order() == 4
+
+    G = DihedralGroup(50)
+    S2 = G.sylow_subgroup(2)
+    assert S2.order() == 4
+
 
 @slow
 def test_presentation():
