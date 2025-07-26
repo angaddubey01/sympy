@@ -55,7 +55,8 @@ from sympy.polys.orderings import lex, grlex, grevlex
 
 from sympy import (
     S, Integer, Rational, Float, Mul, Symbol, sqrt, Piecewise, Derivative,
-    exp, sin, tanh, expand, oo, I, pi, re, im, rootof, Eq, Tuple, Expr, diff)
+    exp, sin, tanh, expand, oo, I, pi, re, im, rootof, Eq, Tuple, Expr, diff,
+    sympify)
 
 from sympy.core.basic import _aresame
 from sympy.core.compatibility import iterable
@@ -1443,6 +1444,16 @@ def test_Poly_clear_denoms():
         x/3 + sqrt(2), x, domain='EX').clear_denoms(convert=True)
     assert coeff == 3 and poly == Poly(
         x + 3*sqrt(2), x, domain='EX') and poly.get_domain() == EX
+
+    g = sympify(
+        "-117968192370600*18**(1/3)/(217603955769048*(24201 + 253*sqrt(9165))**(1/3) + 2273005839412*sqrt(9165)*(24201 + 253*sqrt(9165))**(1/3)) - "
+        "15720318185*2**(2/3)*3**(1/3)*(24201 + 253*sqrt(9165))**(2/3)/(217603955769048*(24201 + 253*sqrt(9165))**(1/3) + 2273005839412*sqrt(9165)*(24201 + 253*sqrt(9165))**(1/3)) + "
+        "15720318185*12**(1/3)*(24201 + 253*sqrt(9165))**(2/3)/(217603955769048*(24201 + 253*sqrt(9165))**(1/3) + 2273005839412*sqrt(9165)*(24201 + 253*sqrt(9165))**(1/3)) + "
+        "117968192370600*2**(1/3)*3**(2/3)/(217603955769048*(24201 + 253*sqrt(9165))**(1/3) + 2273005839412*sqrt(9165)*(24201 + 253*sqrt(9165))**(1/3))"
+    )
+    f = Poly(g, x)
+    _, h = f.clear_denoms()
+    assert h.is_zero and h == Poly(0, x, domain='EX')
 
 
 def test_Poly_rat_clear_denoms():

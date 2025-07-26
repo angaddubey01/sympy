@@ -26,7 +26,8 @@ from sympy.polys.densebasic import (
     dmp_zero, dmp_ground,
     dmp_zero_p,
     dup_to_raw_dict, dup_from_raw_dict,
-    dmp_zeros
+    dmp_zeros,
+    _rec_strip
 )
 from sympy.polys.polyerrors import (
     MultivariatePolynomialError,
@@ -1198,6 +1199,8 @@ def dup_clear_denoms(f, K0, K1=None, convert=False):
     if not K1.is_one(common):
         f = dup_mul_ground(f, common, K0)
 
+    f = dup_strip(f)
+
     if not convert:
         return common, f
     else:
@@ -1251,6 +1254,8 @@ def dmp_clear_denoms(f, u, K0, K1=None, convert=False):
 
     if not K1.is_one(common):
         f = dmp_mul_ground(f, common, u, K0)
+
+    f = _rec_strip(f, u)
 
     if not convert:
         return common, f
