@@ -228,6 +228,8 @@ def test_hstack():
     M4 = Matrix.zeros(0, 3)
     m = ShapingOnlyMatrix.hstack(M1, M2, M3, M4)
     assert m.rows == 0 and m.cols == 6
+    m = Matrix.hstack(M1, M2, M3, M4)
+    assert m.rows == 0 and m.cols == 6
 
 def test_vstack():
     m = ShapingOnlyMatrix(4, 3, lambda i, j: i*3 + j)
@@ -248,6 +250,12 @@ def test_vstack():
                                 [9, 10, 11]])
     raises(ShapeError, lambda: m.vstack(m, m2))
     assert Matrix.vstack() == Matrix()
+    M1 = Matrix.zeros(0, 0)
+    M2 = Matrix.zeros(1, 0)
+    M3 = Matrix.zeros(2, 0)
+    M4 = Matrix.zeros(3, 0)
+    m = Matrix.vstack(M1, M2, M3, M4)
+    assert m.rows == 6 and m.cols == 0
 
 
 # PropertiesOnlyMatrix tests
