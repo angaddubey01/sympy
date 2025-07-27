@@ -1,6 +1,10 @@
 from __future__ import print_function, division
 
-from collections import MutableMapping, defaultdict
+try:
+    from collections.abc import MutableMapping
+except ImportError:
+    from collections import MutableMapping
+from collections import defaultdict
 
 from sympy.core import (Add, Mul, Pow, Integer, Number, NumberSymbol,)
 from sympy.core.numbers import ImaginaryUnit

@@ -1653,3 +1653,15 @@ def test_mod_inverse():
 
 def test_golden_ratio_rewrite_as_sqrt():
     assert GoldenRatio.rewrite(sqrt) == S.Half + sqrt(5)*S.Half
+
+
+def test_number_lt_returns_notimplemented_for_unknown_type():
+    one = Integer(1)
+
+    class Foo:
+        def __gt__(self, other):
+            return other == one
+
+    f = Foo()
+    assert one.__lt__(f) is NotImplemented
+    assert one < f

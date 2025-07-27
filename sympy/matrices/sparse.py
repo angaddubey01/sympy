@@ -14,7 +14,10 @@ from sympy.utilities.iterables import uniq
 
 from .matrices import MatrixBase, ShapeError, a2idx
 from .dense import Matrix
-import collections
+try:
+    from collections.abc import Callable
+except ImportError:
+    from collections import Callable
 
 
 class SparseMatrix(MatrixBase):
@@ -53,7 +56,7 @@ class SparseMatrix(MatrixBase):
             self.rows = as_int(args[0])
             self.cols = as_int(args[1])
 
-            if isinstance(args[2], collections.Callable):
+            if isinstance(args[2], Callable):
                 op = args[2]
                 for i in range(self.rows):
                     for j in range(self.cols):

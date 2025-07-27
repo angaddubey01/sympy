@@ -1,6 +1,10 @@
 """Base class for all the objects in SymPy"""
 from __future__ import print_function, division
-from collections import Mapping, defaultdict
+try:
+    from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
+from collections import defaultdict
 from itertools import chain
 
 from .assumptions import BasicMeta, ManagedProperties
@@ -313,7 +317,7 @@ class Basic(with_metaclass(ManagedProperties)):
             try:
                 other = _sympify(other)
             except SympifyError:
-                return False    # sympy != other
+                return NotImplemented
 
             if type(self) != type(other):
                 return False
@@ -329,7 +333,10 @@ class Basic(with_metaclass(ManagedProperties)):
 
            but faster
         """
-        return not self.__eq__(other)
+        result = self.__eq__(other)
+        if result is NotImplemented:
+            return NotImplemented
+        return not result
 
     def dummy_eq(self, other, symbol=None):
         """

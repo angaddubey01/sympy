@@ -1791,3 +1791,15 @@ def test_normal():
     x = symbols('x')
     e = Mul(S.Half, 1 + x, evaluate=False)
     assert e.normal() == e
+
+
+def test_lt_returns_notimplemented_for_unknown_type():
+    x = Symbol('x')
+
+    class Foo:
+        def __gt__(self, other):
+            return other == x
+
+    f = Foo()
+    assert x.__lt__(f) is NotImplemented
+    assert x < f
