@@ -85,3 +85,27 @@ def test_dummy_eq():
 
     assert (u**2 + y).dummy_eq(x**2 + y, x) is True
     assert (u**2 + y).dummy_eq(x**2 + y, y) is False
+
+
+def test_custom_class_comparison():
+    """Test that equality comparisons with custom classes work correctly."""
+    from sympy import Basic, sympify
+    
+    class CustomClass:
+        """A custom class that can be compared with sympy Basic objects."""
+        def __init__(self, value):
+            self.value = value
+            
+        def __eq__(self, other):
+            if isinstance(other, Basic):
+                return self.value == sympify(other)
+            return NotImplemented
+    
+    # Create a sympy object and a custom object with the same value
+    sympy_obj = Rational(5)
+    custom_obj = CustomClass(5)
+    
+    # Test bidirectional equality
+    assert custom_obj == sympy_obj  # Custom __eq__ is used
+    assert sympy_obj == custom_obj  # Basic's __eq__ should return NotImplemented
+                                    # allowing Python to use CustomClass.__eq__

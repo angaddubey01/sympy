@@ -25,7 +25,10 @@ every time you call ``show()`` and the old one is left to the garbage collector.
 from __future__ import print_function, division
 
 import inspect
-from collections import Callable
+try:
+    from collections.abc import Callable  # Python 3.3+
+except ImportError:
+    from collections import Callable  # Python 2.7 - 3.2
 import warnings
 import sys
 
