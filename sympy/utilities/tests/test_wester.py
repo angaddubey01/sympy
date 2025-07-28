@@ -1946,7 +1946,6 @@ def test_R17():
                - 2.8469909700078206) < 1e-15
 
 
-@XFAIL
 def test_R18():
     k = symbols('k', integer=True, positive=True)
     Sm = Sum(1/(2**k*k**2), (k, 1, oo))

@@ -23,6 +23,13 @@ except ImportError:
 
 del mpmath
 
+# Workaround for Python 3.10+ compatibility: restore removed ABCs
+# Workaround for Python 3.10+ compatibility: restore removed ABCs
+import collections
+import collections.abc as _abc
+for _name in dir(_abc):
+    setattr(collections, _name, getattr(_abc, _name))
+
 from sympy.release import __version__
 
 if 'dev' in __version__:
