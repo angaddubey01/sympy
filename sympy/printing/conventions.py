@@ -11,7 +11,7 @@ from sympy.core.compatibility import Iterable
 _name_with_digits_p = re.compile(r'^([a-zA-Z]+)([0-9]+)$')
 
 
-def split_super_sub(text):
+def split_super_sub(text, split_digits=True):
     """Split a symbol name into a name, superscripts and subscripts
 
     The first part of the symbol name is considered to be its actual
@@ -19,6 +19,15 @@ def split_super_sub(text):
     preceded with a "^" character or by "__". Each subscript is preceded
     by a "_" character.  The three return values are the actual name, a
     list with superscripts and a list with subscripts.
+
+    Parameters
+    ==========
+
+    text : str
+        The symbol name to split.
+    split_digits : bool, optional
+        Whether to treat digits at the end of the name as subscripts.
+        Default is True.
 
     Examples
     ========
@@ -28,6 +37,10 @@ def split_super_sub(text):
     ('a', ['1'], ['x'])
     >>> split_super_sub('var_sub1__sup_sub2')
     ('var', ['sup'], ['sub1', 'sub2'])
+    >>> split_super_sub('x2', split_digits=False)
+    ('x2', [], [])
+    >>> split_super_sub('x2', split_digits=True)
+    ('x', [], ['2'])
 
     """
     if len(text) == 0:
@@ -62,11 +75,12 @@ def split_super_sub(text):
             raise RuntimeError("This should never happen.")
 
     # make a little exception when a name ends with digits, i.e. treat them
-    # as a subscript too.
-    m = _name_with_digits_p.match(name)
-    if m:
-        name, sub = m.groups()
-        subs.insert(0, sub)
+    # as a subscript too, but only if split_digits is True
+    if split_digits:
+        m = _name_with_digits_p.match(name)
+        if m:
+            name, sub = m.groups()
+            subs.insert(0, sub)
 
     return name, supers, subs
 
