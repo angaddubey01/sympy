@@ -341,12 +341,14 @@ class MathMLContentPrinter(MathMLPrinterBase):
                         mo = self.dom.createElement('mml:mo')
                         mo.appendChild(self.dom.createTextNode(" "))
                         mrow.appendChild(mo)
-                    mi = self.dom.createElement('mml:mi')
+                    tag = 'mml:mn' if item.isdigit() else 'mml:mi'
+                    mi = self.dom.createElement(tag)
                     mi.appendChild(self.dom.createTextNode(item))
                     mrow.appendChild(mi)
                 return mrow
             else:
-                mi = self.dom.createElement('mml:mi')
+                tag = 'mml:mn' if items[0].isdigit() else 'mml:mi'
+                mi = self.dom.createElement(tag)
                 mi.appendChild(self.dom.createTextNode(items[0]))
                 return mi
 
@@ -748,12 +750,14 @@ class MathMLPresentationPrinter(MathMLPrinterBase):
                         mo = self.dom.createElement('mo')
                         mo.appendChild(self.dom.createTextNode(" "))
                         mrow.appendChild(mo)
-                    mi = self.dom.createElement('mi')
+                    tag = 'mn' if item.isdigit() else 'mi'
+                    mi = self.dom.createElement(tag)
                     mi.appendChild(self.dom.createTextNode(item))
                     mrow.appendChild(mi)
                 return mrow
             else:
-                mi = self.dom.createElement('mi')
+                tag = 'mn' if items[0].isdigit() else 'mi'
+                mi = self.dom.createElement(tag)
                 mi.appendChild(self.dom.createTextNode(items[0]))
                 return mi
 
