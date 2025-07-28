@@ -288,10 +288,12 @@ class polylog(Function):
         return z*lerchphi(z, s, 1)
 
     def _eval_expand_func(self, **hints):
-        from sympy import log, expand_mul, Dummy, exp_polar, I
+        from sympy import log, expand_mul, Dummy, exp_polar, I, pi, log, sympify
         s, z = self.args
         if s == 1:
-            return -log(1 + exp_polar(-I*pi)*z)
+            return -log(1 - z)
+        if s == 2 and z == sympify(1)/2:
+            return -log(2)**2/2 + pi**2/12
         if s.is_Integer and s <= 0:
             u = Dummy('u')
             start = u/(1 - u)

@@ -123,15 +123,16 @@ def myexpand(func, target):
 
 
 def test_polylog_expansion():
-    from sympy import log
+    from sympy import log, Rational, pi
     assert polylog(s, 0) == 0
     assert polylog(s, 1) == zeta(s)
     assert polylog(s, -1) == -dirichlet_eta(s)
 
-    assert myexpand(polylog(1, z), -log(1 + exp_polar(-I*pi)*z))
+    assert myexpand(polylog(1, z), -log(1 - z))
     assert myexpand(polylog(0, z), z/(1 - z))
     assert myexpand(polylog(-1, z), z**2/(1 - z)**2 + z/(1 - z))
     assert myexpand(polylog(-5, z), None)
+    assert myexpand(polylog(2, Rational(1, 2)), -log(2)**2/2 + pi**2/12)
 
 
 def test_lerchphi_expansion():
