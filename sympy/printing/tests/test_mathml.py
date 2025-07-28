@@ -461,6 +461,9 @@ def test_presentation_printmethod():
     assert mpp.doprint(1 + x) == '<mrow><mi>x</mi><mo>+</mo><mn>1</mn></mrow>'
     assert mpp.doprint(x**2) == '<msup><mi>x</mi><mn>2</mn></msup>'
     assert mpp.doprint(2*x) == '<mrow><mn>2</mn><mo>&InvisibleTimes;</mo><mi>x</mi></mrow>'
+    # symbols ending with digits should be rendered using subscripts
+    x2 = Symbol('x2')
+    assert mpp.doprint(x2) == '<msub><mi>x</mi><mi>2</mi></msub>'
 
 
 def test_presentation_mathml_core():
