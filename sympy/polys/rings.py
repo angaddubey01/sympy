@@ -616,12 +616,15 @@ class PolyElement(DomainElement, DefaultPrinting, CantSympify, dict):
             return new_ring.from_dict(self, self.ring.domain)
 
     def as_expr(self, *symbols):
-        if symbols and len(symbols) != self.ring.ngens:
-            raise ValueError("not enough symbols, expected %s got %s" % (self.ring.ngens, len(symbols)))
+        if symbols:
+            if len(symbols) != self.ring.ngens:
+                raise ValueError("not enough symbols, expected %s got %s" %
+                                 (self.ring.ngens, len(symbols)))
+            gens = symbols
         else:
-            symbols = self.ring.symbols
+            gens = self.ring.symbols
 
-        return expr_from_dict(self.as_expr_dict(), *symbols)
+        return expr_from_dict(self.as_expr_dict(), *gens)
 
     def as_expr_dict(self):
         to_sympy = self.ring.domain.to_sympy
