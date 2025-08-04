@@ -616,38 +616,12 @@ class PolyElement(DomainElement, DefaultPrinting, CantSympify, dict):
             return new_ring.from_dict(self, self.ring.domain)
 
     def as_expr(self, *symbols):
-        """Return the SymPy expression corresponding to this polynomial.
-
-        Optionally, custom generators (symbols) can be provided. These can be
-        given either as separate positional arguments, a single iterable of
-        generators, or a single string of comma-separated names. The number of
-        provided symbols must match the number of generators in the ring.
-        """
-        if not symbols:
-            syms = self.ring.symbols
+        if symbols and len(symbols) != self.ring.ngens:
+            raise ValueError("not enough symbols, expected %s got %s" % (self.ring.ngens, len(symbols)))
         else:
-            # Support: as_expr(x, y, z) or as_expr((x, y, z)) or as_expr('x,y,z')
-            if len(symbols) == 1:
-                arg = symbols[0]
-                try:
-                    syms = tuple(_parse_symbols(arg))
-                except GeneratorsError:
-                    # Fallback to using the single argument as is (e.g., a
-                    # Symbol when ngens == 1)
-                    syms = (arg,)
-            else:
-                syms = tuple(symbols)
-                # If any are strings, convert them to Symbols
-                if any(isinstance(s, str) for s in syms):
-                    if all(isinstance(s, str) for s in syms):
-                        syms = tuple(_symbols(syms))
-                    else:
-                        syms = tuple(Symbol(s) if isinstance(s, str) else s for s in syms)
+            symbols = self.ring.symbols
 
-            if len(syms) != self.ring.ngens:
-                raise ValueError("expected %s symbols, got %s" % (self.ring.ngens, len(syms)))
-
-        return expr_from_dict(self.as_expr_dict(), *syms)
+        return expr_from_dict(self.as_expr_dict(), *symbols)
 
     def as_expr_dict(self):
         to_sympy = self.ring.domain.to_sympy
