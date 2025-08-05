@@ -5,7 +5,7 @@ from sympy.matrices.expressions.blockmatrix import (
 from sympy.matrices.expressions import (MatrixSymbol, Identity,
         Inverse, trace, Transpose, det)
 from sympy.matrices import (
-    Matrix, ImmutableMatrix, ImmutableSparseMatrix)
+    Matrix, ImmutableMatrix, ImmutableSparseMatrix, ZeroMatrix)
 from sympy.core import Tuple, symbols, Expr
 from sympy.core.compatibility import range
 from sympy.functions import transpose
@@ -222,3 +222,17 @@ def test_block_collapse_type():
     assert block_collapse(Transpose(bm1)).__class__ == BlockDiagMatrix
     assert bc_transpose(Transpose(bm1)).__class__ == BlockDiagMatrix
     assert bc_inverse(Inverse(bm1)).__class__ == BlockDiagMatrix
+
+def test_blockmul_with_zero_blocks():
+    # Issue: multiplying BlockMatrix containing ZeroMatrix blocks should preserve ZeroMatrix
+    a = MatrixSymbol('a', 2, 2)
+    z = ZeroMatrix(2, 2)
+    b = BlockMatrix([[a, z], [z, z]])
+    # single multiplication yields a**2 in (0,0) and zero blocks elsewhere
+    c1 = block_collapse(b * b)
+    expected = BlockMatrix([[a**2, z], [z, z]])
+    assert c1 == expected
+    # double multiplication yields a**3 in (0,0) and zero blocks elsewhere
+    c2 = block_collapse(b * b * b)
+    expected2 = BlockMatrix([[a**3, z], [z, z]])
+    assert c2 == expected2

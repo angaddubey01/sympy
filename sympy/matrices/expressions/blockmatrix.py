@@ -162,9 +162,25 @@ class BlockMatrix(MatrixExpr):
             and self.colblocksizes == other.colblocksizes)
 
     def _blockmul(self, other):
+        # Perform block-wise multiplication when both operands are block matrices
         if (isinstance(other, BlockMatrix) and
                 self.colblocksizes == other.rowblocksizes):
-            return BlockMatrix(self.blocks*other.blocks)
+            # build each block entry as sum of products, initializing with ZeroMatrix
+            A = self.blocks
+            B = other.blocks
+            nrows, ncols = self.blockshape[0], other.blockshape[1]
+            new_blocks = []
+            for i in range(nrows):
+                row = []
+                for j in range(ncols):
+                    rows_i = self.rowblocksizes[i]
+                    cols_j = other.colblocksizes[j]
+                    s = ZeroMatrix(rows_i, cols_j)
+                    for k in range(self.blockshape[1]):
+                        s = s + A[i, k] * B[k, j]
+                    row.append(s)
+                new_blocks.append(row)
+            return BlockMatrix(new_blocks)
 
         return self * other
 
