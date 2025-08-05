@@ -377,6 +377,10 @@ class MatrixShaping(MatrixRequired):
         if len(args) == 0:
             return cls._new()
 
+        if all(a.rows == 0 for a in args):
+            cols = sum(a.cols for a in args)
+            return cls._new(0, cols, [])
+
         kls = type(args[0])
         return reduce(kls.row_join, args)
 
@@ -599,6 +603,10 @@ class MatrixShaping(MatrixRequired):
         """
         if len(args) == 0:
             return cls._new()
+
+        if all(a.cols == 0 for a in args):
+            rows = sum(a.rows for a in args)
+            return cls._new(rows, 0, [])
 
         kls = type(args[0])
         return reduce(kls.col_join, args)

@@ -2,6 +2,10 @@ from __future__ import print_function, division
 
 import copy
 from collections import defaultdict
+try:
+    from collections.abc import Callable
+except ImportError:
+    from collections import Callable
 
 from sympy.core.containers import Dict
 from sympy.core.expr import Expr
@@ -53,7 +57,7 @@ class SparseMatrix(MatrixBase):
             self.rows = as_int(args[0])
             self.cols = as_int(args[1])
 
-            if isinstance(args[2], collections.Callable):
+            if isinstance(args[2], Callable):
                 op = args[2]
                 for i in range(self.rows):
                     for j in range(self.cols):

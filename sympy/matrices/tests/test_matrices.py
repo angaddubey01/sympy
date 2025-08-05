@@ -2454,6 +2454,20 @@ def test_issue_5320():
         [0, 1, 0, 2]
     ])
 
+
+def test_hstack_vstack_zerorow_issue():
+    M1 = Matrix.zeros(0, 0)
+    M2 = Matrix.zeros(0, 1)
+    M3 = Matrix.zeros(0, 2)
+    M4 = Matrix.zeros(0, 3)
+    assert Matrix.hstack(M1, M2, M3, M4).shape == (0, 6)
+
+    N1 = Matrix.zeros(0, 0)
+    N2 = Matrix.zeros(1, 0)
+    N3 = Matrix.zeros(2, 0)
+    N4 = Matrix.zeros(3, 0)
+    assert Matrix.vstack(N1, N2, N3, N4).shape == (6, 0)
+
 def test_issue_11944():
     A = Matrix([[1]])
     AIm = sympify(A)
