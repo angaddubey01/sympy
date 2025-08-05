@@ -376,6 +376,20 @@ class MatrixShaping(MatrixRequired):
         """
         if len(args) == 0:
             return cls._new()
+        # Special-case: if all inputs have 0 rows then horizontal stacking
+        # should preserve the (sum of) column sizes. In particular, stacking
+        # matrices of shapes (0, n1), (0, n2), ... must produce shape
+        # (0, n1+n2+...). This guards against any internal shortcuts that might
+        # otherwise drop empty blocks.
+        try:
+            if all(getattr(a, 'rows', None) == 0 for a in args):
+                total_cols = sum(getattr(a, 'cols', 0) for a in args)
+                # build a 0 x total_cols zero matrix of the appropriate class
+                return cls.zeros(0, total_cols)
+        except Exception:
+            # If any of the arguments do not have the expected attributes just
+            # fall back to the generic implementation below.
+            pass
 
         kls = type(args[0])
         return reduce(kls.row_join, args)
@@ -599,6 +613,16 @@ class MatrixShaping(MatrixRequired):
         """
         if len(args) == 0:
             return cls._new()
+        # Special-case: if all inputs have 0 columns then vertical stacking
+        # should preserve the (sum of) row sizes. In particular, stacking
+        # matrices of shapes (m1, 0), (m2, 0), ... must produce shape
+        # (m1+m2+..., 0).
+        try:
+            if all(getattr(a, 'cols', None) == 0 for a in args):
+                total_rows = sum(getattr(a, 'rows', 0) for a in args)
+                return cls.zeros(total_rows, 0)
+        except Exception:
+            pass
 
         kls = type(args[0])
         return reduce(kls.col_join, args)
