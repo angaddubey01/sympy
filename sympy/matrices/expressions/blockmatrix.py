@@ -164,7 +164,20 @@ class BlockMatrix(MatrixExpr):
     def _blockmul(self, other):
         if (isinstance(other, BlockMatrix) and
                 self.colblocksizes == other.rowblocksizes):
-            return BlockMatrix(self.blocks*other.blocks)
+            r, c = self.blockshape[0], other.blockshape[1]
+            new_blocks = []
+            for i in range(r):
+                row = []
+                for j in range(c):
+                    pieces = [self.blocks[i, k] * other.blocks[k, j]
+                              for k in range(self.blockshape[1])]
+                    block = Add(*pieces)
+                    if block == 0:
+                        block = ZeroMatrix(self.blocks[i, 0].rows,
+                                           other.blocks[0, j].cols)
+                    row.append(block)
+                new_blocks.append(row)
+            return BlockMatrix(new_blocks)
 
         return self * other
 

@@ -179,6 +179,22 @@ def test_BlockDiagMatrix():
     assert (X._blockmul(M)).is_MatMul
     assert (X._blockadd(M)).is_MatAdd
 
+
+def test_blockmul_with_zero_blocks():
+    from sympy import ZeroMatrix
+    a = MatrixSymbol('a', 2, 2)
+    z = ZeroMatrix(2, 2)
+    b = BlockMatrix([[a, z], [z, z]])
+    c = b._blockmul(b)
+    assert c.blocks[0, 1].is_ZeroMatrix
+    assert c.blocks[1, 0].is_ZeroMatrix
+    assert c.blocks[1, 1].is_ZeroMatrix
+    d = c._blockmul(b)
+    assert d.blocks[0, 1].is_ZeroMatrix
+    assert d.blocks[1, 0].is_ZeroMatrix
+    assert d.blocks[1, 1].is_ZeroMatrix
+    assert block_collapse(b*b*b).blocks[0, 0] == a**3
+
 def test_blockcut():
     A = MatrixSymbol('A', n, m)
     B = blockcut(A, (n/2, n/2), (m/2, m/2))
