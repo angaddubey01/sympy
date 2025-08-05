@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 
 from sympy import ask, Q
-from sympy.core import Basic, Add
+from sympy.core import Basic, Add, S
 from sympy.core.compatibility import range
 from sympy.strategies import typed, exhaust, condition, do_one, unpack
 from sympy.strategies.traverse import bottom_up
@@ -148,11 +148,43 @@ class BlockMatrix(MatrixExpr):
 
     @property
     def rowblocksizes(self):
-        return [self.blocks[i, 0].rows for i in range(self.blockshape[0])]
+        sizes = []
+        for i in range(self.blockshape[0]):
+            block = self.blocks[i, 0]
+            if block is None:
+                sizes.append(0)  # None blocks treated as zero-sized
+            elif hasattr(block, 'rows'):
+                sizes.append(block.rows)
+            elif hasattr(block, 'shape') and len(getattr(block, 'shape', ())) >= 1:
+                # Use shape if available
+                sizes.append(block.shape[0])
+            elif isinstance(block, (S.Zero, S.One)):
+                # For scalar values like Zero() or One()
+                sizes.append(0 if block == S.Zero else 1)
+            else:
+                # For other scalar values without a 'rows' attribute
+                sizes.append(1)  # Default to size 1 for scalar elements
+        return sizes
 
     @property
     def colblocksizes(self):
-        return [self.blocks[0, i].cols for i in range(self.blockshape[1])]
+        sizes = []
+        for i in range(self.blockshape[1]):
+            block = self.blocks[0, i]
+            if block is None:
+                sizes.append(0)  # None blocks treated as zero-sized
+            elif hasattr(block, 'cols'):
+                sizes.append(block.cols)
+            elif hasattr(block, 'shape') and len(getattr(block, 'shape', ())) >= 2:
+                # Use shape if available
+                sizes.append(block.shape[1])
+            elif isinstance(block, (S.Zero, S.One)):
+                # For scalar values like Zero() or One()
+                sizes.append(0 if block == S.Zero else 1)
+            else:
+                # For other scalar values without a 'cols' attribute
+                sizes.append(1)  # Default to size 1 for scalar elements
+        return sizes
 
     def structurally_equal(self, other):
         return (isinstance(other, BlockMatrix)
@@ -164,8 +196,47 @@ class BlockMatrix(MatrixExpr):
     def _blockmul(self, other):
         if (isinstance(other, BlockMatrix) and
                 self.colblocksizes == other.rowblocksizes):
-            return BlockMatrix(self.blocks*other.blocks)
-
+            try:
+                return BlockMatrix(self.blocks*other.blocks)
+            except ValueError:
+                # Handle the case when multiplication results in scalar blocks
+                from sympy.matrices.immutable import ImmutableDenseMatrix
+                # Calculate the result dimensions
+                rows, cols = self.blockshape[0], other.blockshape[1]
+                result = []
+                
+                # Perform block matrix multiplication manually
+                for i in range(rows):
+                    row = []
+                    for j in range(cols):
+                        # Calculate the (i,j) block
+                        block_sum = None
+                        for k in range(self.blockshape[1]):
+                            # Get the blocks to multiply
+                            left_block = self.blocks[i, k]
+                            right_block = other.blocks[k, j]
+                            
+                            # Multiply the blocks
+                            prod = left_block * right_block
+                            
+                            # Add to the sum for this block
+                            if block_sum is None:
+                                block_sum = prod
+                            else:
+                                # Convert scalar zeros to matrix zeros if necessary
+                                if block_sum == S.Zero and hasattr(prod, 'shape'):
+                                    block_sum = ZeroMatrix(*prod.shape)
+                                elif prod == S.Zero and hasattr(block_sum, 'shape'):
+                                    prod = ZeroMatrix(*block_sum.shape)
+                                block_sum = block_sum + prod
+                        
+                        # Add the result to the row
+                        row.append(block_sum)
+                    
+                    result.append(row)
+                
+                return BlockMatrix(ImmutableDenseMatrix(result))
+        
         return self * other
 
     def _blockadd(self, other):
