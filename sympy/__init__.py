@@ -38,6 +38,14 @@ if sys.version_info[0] == 2 and sys.version_info[1] < 6:
     raise ImportError("Python Version 2.6 or above is required for SymPy.")
 else:  # Python 3
     pass
+
+import collections
+from collections import abc
+for attr in ('Mapping', 'MutableMapping', 'Sequence', 'MutableSequence',
+             'Set', 'MutableSet', 'Iterable', 'Container', 'Sized',
+             'Callable'):
+    if not hasattr(collections, attr):
+        setattr(collections, attr, getattr(abc, attr))
     # Here we can also check for specific Python 3 versions, if needed
 
 del sys
