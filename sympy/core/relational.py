@@ -379,11 +379,26 @@ class Relational(Boolean, Expr, EvalfMixin):
 
     def _eval_as_set(self):
         # self is univariate and periodicity(self, x) in (0, None)
+        #
+        # For inequalities this delegates to solve_univariate_inequality as
+        # before. However, for equalities we should use solveset which will
+        # return a ConditionSet when a closed-form solution is not available
+        # rather than raising NotImplementedError. This ensures that
+        # as_set() on an Equality returns a set instead of raising.
         from sympy.solvers.inequalities import solve_univariate_inequality
+        from sympy.solvers.solveset import solveset
+        from sympy.core.singleton import S
+
         syms = self.free_symbols
         assert len(syms) == 1
         x = syms.pop()
-        return solve_univariate_inequality(self, x, relational=False)
+
+        if self.rel_op == '==':
+            # Solve the equality over the reals; solveset will return
+            # FiniteSet/Interval/Union or ConditionSet as appropriate.
+            return solveset(self, x, S.Reals)
+        else:
+            return solve_univariate_inequality(self, x, relational=False)
 
     @property
     def binary_symbols(self):
