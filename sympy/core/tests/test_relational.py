@@ -1,8 +1,8 @@
 from sympy.utilities.pytest import XFAIL, raises, warns_deprecated_sympy
 from sympy import (S, Symbol, symbols, nan, oo, I, pi, Float, And, Or,
     Not, Implies, Xor, zoo, sqrt, Rational, simplify, Function,
-    log, cos, sin, Add, floor, ceiling, trigsimp)
-from sympy.core.compatibility import range
+    log, cos, sin, Add, Mul, Pow, floor, ceiling, trigsimp, ConditionSet)
+from sympy.core.compatibility import range, PY3
 from sympy.core.relational import (Relational, Equality, Unequality,
                                    GreaterThan, LessThan, StrictGreaterThan,
                                    StrictLessThan, Rel, Eq, Lt, Le,
@@ -401,6 +401,12 @@ def test_univariate_relational_as_set():
         Interval(0, oo, True, True)
 
     assert (x**2 >= 4).as_set() == Interval(-oo, -2) + Interval(2, oo)
+
+
+def test_relational_as_set_conditionset():
+    n = Symbol('n')
+    r = Eq(n*cos(n) - 3*sin(n), 0)
+    assert r.as_set() == ConditionSet(n, r, S.Reals)
 
 
 @XFAIL
