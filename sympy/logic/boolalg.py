@@ -152,11 +152,13 @@ class Boolean(Basic):
                     if s in (S.EmptySet, S.UniversalSet, S.Reals):
                         reps[r] = s.as_relational(x)
                         continue
-                    raise NotImplementedError(filldedent('''
-                        as_set is not implemented for relationals
-                        with periodic solutions
-                        '''))
-            return self.subs(reps)._eval_as_set()
+                    from sympy.sets.conditionset import ConditionSet
+                    return ConditionSet(x, self, S.Reals)
+            try:
+                return self.subs(reps)._eval_as_set()
+            except NotImplementedError:
+                from sympy.sets.conditionset import ConditionSet
+                return ConditionSet(x, self, S.Reals)
         else:
             raise NotImplementedError("Sorry, as_set has not yet been"
                                       " implemented for multivariate"
